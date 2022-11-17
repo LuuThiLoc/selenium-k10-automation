@@ -16,7 +16,7 @@ public class JsExecutor implements Urls {
 
         try {
             // Navigate to the target page
-            driver.get(BASE_URL.concat(FLOATING_MENU_SLUG));
+            driver.get(HEROKU_BASE_URL.concat(FLOATING_MENU_SLUG));
             JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
             PageHelper pageHelper = new PageHelper(jsExecutor); // truyền driver vào
 
@@ -33,7 +33,7 @@ public class JsExecutor implements Urls {
             Thread.sleep(3000);
 
             // Navigate to the Dynamic Control page
-            driver.get(Urls.BASE_URL.concat(Urls.DYNAMIC_CONTROL_SLUG));
+            driver.get(Urls.HEROKU_BASE_URL.concat(Urls.DYNAMIC_CONTROL_SLUG));
 
             // Highlight border of Elem
             By checkboxFormSel = By.id("checkbox-example");

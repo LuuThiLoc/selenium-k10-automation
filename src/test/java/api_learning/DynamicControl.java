@@ -18,7 +18,7 @@ public class DynamicControl {
 
         try {
             // Navigate to the target page
-            driver.get(Urls.BASE_URL.concat(Urls.DYNAMIC_CONTROL_SLUG));
+            driver.get(Urls.HEROKU_BASE_URL.concat(Urls.DYNAMIC_CONTROL_SLUG));
 
             // Define 2 forms locator
             By checkboxFormSel = By.id("checkbox-example");

@@ -12,7 +12,7 @@ public class LoginMod03Test implements Urls {
 
         try {
             // Navigate to the target page
-            driver.get(BASE_URL.concat(LOGIN_SLUG));
+            driver.get(HEROKU_BASE_URL.concat(LOGIN_SLUG));
 
             // Login with creds
             LoginPageMod03 loginPageMod03 = new LoginPageMod03(driver);

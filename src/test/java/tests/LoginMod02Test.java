@@ -1,7 +1,6 @@
 package tests;
 
 import driver.DriverFactory;
-import model.pages.LoginPageMod01;
 import model.pages.LoginPageMod02;
 import org.openqa.selenium.WebDriver;
 import url.Urls;
@@ -13,7 +12,7 @@ public class LoginMod02Test implements Urls {
 
         try {
             // Navigate to the target page
-            driver.get(BASE_URL.concat(LOGIN_SLUG));
+            driver.get(HEROKU_BASE_URL.concat(LOGIN_SLUG));
 
             // Login with creds
             LoginPageMod02 loginPageMod02 = new LoginPageMod02(driver);
