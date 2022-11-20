@@ -15,7 +15,6 @@ public class DemoHomePageTest implements Urls {
 
         try {
             driver.get(BASE_URL);
-
             HomePage homePage = new HomePage(driver);
             FooterComponent footerComp = homePage.footerComp();
             InformationColumn informationColumn = footerComp.informationColumn();

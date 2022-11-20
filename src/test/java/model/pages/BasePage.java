@@ -1,7 +1,6 @@
 package model.pages;
 
 import model.components.Component;
-import model.components.PageFooterComponent;
 import model.components.global.footer.FooterComponent;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
