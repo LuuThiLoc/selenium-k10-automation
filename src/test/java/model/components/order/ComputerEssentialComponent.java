@@ -24,6 +24,9 @@ public abstract class ComputerEssentialComponent extends Component {
         try {
             optionElem = component.findElement(optionSel);
         } catch (Exception ignored) {}
+        // try - catch: nếu có lỗi và throw ra Exception thì if() vẫn run
+        // ignored ~ e (alias)
+        // (Exception ignored) {}: ko care đến việc throw ra E gì trong catch block
 
         if (optionElem != null) {
             optionElem.click();
