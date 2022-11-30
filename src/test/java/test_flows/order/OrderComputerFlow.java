@@ -19,8 +19,8 @@ public class OrderComputerFlow <T extends ComputerEssentialComponent>{
     public void buildCompSpecAndAddToCart(){
         ComputerItemDetailsPage computerItemDetailsPage = new ComputerItemDetailsPage(driver);
         T computerEssentialComp = computerItemDetailsPage.computerComp(computerEssentialComponent);
-        computerEssentialComp.selectProcessorType("Fast"); // type: without spaces
-        computerEssentialComp.selectRAMType("4 GB");
+        computerEssentialComp.selectProcessorType("2.2GHz"); // type: without spaces
+        computerEssentialComp.selectRAMType("4GB");
 
         try{
             Thread.sleep(5000);
