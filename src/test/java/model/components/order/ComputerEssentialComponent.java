@@ -5,7 +5,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-public abstract class ComputerEssentialComponent extends Component {
+public abstract class ComputerEssentialComponent extends BaseItemDetailsComponent {
 
     public ComputerEssentialComponent(WebDriver driver, WebElement component) {
         super(driver, component);

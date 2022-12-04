@@ -15,11 +15,14 @@ public class OrderComputerFlow<T extends ComputerEssentialComponent> {
     private final WebDriver driver;
     private final Class<T> computerEssentialComponent; //T extends ComputerEssentialComponent
     private final ComputerData computerData;
+    private int quantity = 1; // default value
+    double totalItemPrice;
 
-    public OrderComputerFlow(WebDriver driver, Class<T> computerEssentialComponent, ComputerData computerData) {
+    public OrderComputerFlow(WebDriver driver, Class<T> computerEssentialComponent, ComputerData computerData, int quantity) {
         this.driver = driver;
         this.computerEssentialComponent = computerEssentialComponent;
         this.computerData = computerData;
+        this.quantity = quantity;
     }
 
     public void buildCompSpecAndAddToCart() {
@@ -38,8 +41,22 @@ public class OrderComputerFlow<T extends ComputerEssentialComponent> {
             OSAddedPrice = extractAdditionalPrice(OSFullStr);
         }
 
+        if (this.quantity != 1) {
+            computerEssentialComp.inputQuantity(this.quantity);
+        }
+
         double totalAddedPrice = processorAddedPrice + ramAddedPrice + HDDAddedPrice + OSAddedPrice;
-        System.out.println("OSAddedPrice: "+ totalAddedPrice);
+        System.out.println("OSAddedPrice: " + totalAddedPrice);
+
+        totalItemPrice = (computerEssentialComp.basePrice() + totalAddedPrice) * this.quantity;
+
+        // Add to cart
+        computerEssentialComp.clickOnAddToCartBtn();
+        computerItemDetailsPage.barNotificationComp().waitUntilItemAddedToCart();
+        computerItemDetailsPage.barNotificationComp().closeBtnBarNotification();
+
+        // Navigate to shopping cart
+        computerItemDetailsPage.headerComp().clickOnShoppingCartLink();
 
         try {
             Thread.sleep(5000);
@@ -47,14 +64,18 @@ public class OrderComputerFlow<T extends ComputerEssentialComponent> {
         }
     }
 
+
     private double extractAdditionalPrice(String itemStr) {
         double price = 0;
+        int factor = 1;
         Pattern pattern = Pattern.compile("\\[(.*?)\\]");
         Matcher matcher = pattern.matcher(itemStr);
         if (matcher.find()) {
+            String priceStr = matcher.group(1);
+            if (priceStr.startsWith("-")) factor = -1;
             price = Double.parseDouble(matcher.group(1).replaceAll("[+-]", ""));
         }
-        return price;
-    }
 
+        return price * factor;
+    }
 }

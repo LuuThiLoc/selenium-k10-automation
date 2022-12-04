@@ -1,6 +1,7 @@
 package driver;
 
 import org.apache.commons.exec.OS;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -30,6 +31,10 @@ public class DriverFactory {
 
         WebDriver driver = new ChromeDriver(chromeOptions);
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5L));
+//        driver.manage().deleteAllCookies();
+//        driver.get("chrome://settings/clearBrowserData");
+//        driver.switchTo().activeElement();
+//        driver.findElement(By.cssSelector("* /deep/ #clearBrowsingDataConfirm")).click();
 
         return driver;
     }
