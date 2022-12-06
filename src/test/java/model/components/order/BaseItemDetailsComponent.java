@@ -8,7 +8,7 @@ import org.openqa.selenium.WebElement;
 import java.util.List;
 
 public class BaseItemDetailsComponent extends Component {
-    private final static By basePriceSel = By.cssSelector(".product-price");
+    private final static By basePriceSel = By.cssSelector("span[class^='price-value']");
     private final static By quantitySel = By.cssSelector(".qty-input");
     private final static By allOptionsSel = By.cssSelector(".option-list input");
     private final static By addToCartBtnSel = By.cssSelector(".add-to-cart-button"); //or: [id^='add-to-cart-button']
@@ -18,7 +18,7 @@ public class BaseItemDetailsComponent extends Component {
     }
 
     public Double basePrice(){
-        String productPriceText = component.findElement(basePriceSel).getText().trim();
+        String productPriceText = findElement(basePriceSel).getText().trim();
         return Double.parseDouble(productPriceText);
     }
 
@@ -32,7 +32,7 @@ public class BaseItemDetailsComponent extends Component {
         List<WebElement> allOptionsElem = findElements(allOptionsSel);
         allOptionsElem.forEach(option -> {
             if(option.getAttribute("checked")!= null){
-                option.clear();
+                option.click();
             }
         });
     }

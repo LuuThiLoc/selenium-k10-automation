@@ -1,10 +1,16 @@
 package test_flows.order;
 
+import model.components.cart.CartItemRowComponent;
+import model.components.cart.TotalComponent;
 import model.components.order.ComputerEssentialComponent;
 import model.pages.ComputerItemDetailsPage;
+import model.pages.ShoppingCartPage;
 import org.openqa.selenium.WebDriver;
+import org.testng.Assert;
 import test_data.order.ComputerData;
 
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,7 +22,7 @@ public class OrderComputerFlow<T extends ComputerEssentialComponent> {
     private final Class<T> computerEssentialComponent; //T extends ComputerEssentialComponent
     private final ComputerData computerData;
     private int quantity = 1; // default value
-    double totalItemPrice;
+    private double totalItemPrice;
 
     public OrderComputerFlow(WebDriver driver, Class<T> computerEssentialComponent, ComputerData computerData, int quantity) {
         this.driver = driver;
@@ -28,6 +34,10 @@ public class OrderComputerFlow<T extends ComputerEssentialComponent> {
     public void buildCompSpecAndAddToCart() {
         ComputerItemDetailsPage computerItemDetailsPage = new ComputerItemDetailsPage(driver);
         T computerEssentialComp = computerItemDetailsPage.computerComp(computerEssentialComponent);
+
+        // Unselect all default options
+        computerEssentialComp.unselectAllDefaultOptions();
+
         String processorFullStr = computerEssentialComp.selectProcessorType(computerData.getProcessorType()); // type: without spaces
         double processorAddedPrice = extractAdditionalPrice(processorFullStr);
         String ramFullStr = computerEssentialComp.selectRAMType(computerData.getRam());
@@ -46,7 +56,7 @@ public class OrderComputerFlow<T extends ComputerEssentialComponent> {
         }
 
         double totalAddedPrice = processorAddedPrice + ramAddedPrice + HDDAddedPrice + OSAddedPrice;
-        System.out.println("OSAddedPrice: " + totalAddedPrice);
+        System.out.println("totalAddedPrice: " + totalAddedPrice);
 
         totalItemPrice = (computerEssentialComp.basePrice() + totalAddedPrice) * this.quantity;
 
@@ -77,5 +87,48 @@ public class OrderComputerFlow<T extends ComputerEssentialComponent> {
         }
 
         return price * factor;
+    }
+
+    public void verifyShoppingCartPage() {
+        System.out.println("Total Item Price in prev: " + totalItemPrice);
+        ShoppingCartPage shoppingCartPage = new ShoppingCartPage(driver);
+
+        List<CartItemRowComponent> cartItemRowCompList = shoppingCartPage.cartItemRowComponentList();
+        if (cartItemRowCompList.isEmpty()) {
+            Assert.fail("[ERR] There is no item displayed in the shopping cart!");
+        }
+
+        double allSubTotal = 0;
+        for (CartItemRowComponent cartItemRowComp : cartItemRowCompList) {
+            double currentSubTotal = cartItemRowComp.subTotal();
+            double expectedSubTotal = cartItemRowComp.unitPrice() * cartItemRowComp.quantityInput();
+            Assert.assertEquals(currentSubTotal, expectedSubTotal, "[ERR] The SubTotal on the item is incorrect");
+            allSubTotal = allSubTotal + currentSubTotal;
+            System.out.println("currentSubTotal: " + currentSubTotal);
+        }
+
+        TotalComponent totalComp = shoppingCartPage.totalComp();
+        Map<String, Double> priceCategories = totalComp.priceCategories();
+        double checkoutSubtotal = 0;
+        double checkoutOtherFeesTotal = 0;
+        double checkoutTotal = 0;
+
+        for (String priceType : priceCategories.keySet()) {
+            double priceValue = priceCategories.get(priceType);
+            if (priceType.startsWith("Sub-Total")) {
+                checkoutSubtotal = priceValue;
+            } else if (priceType.startsWith("Total")) {
+                checkoutTotal = priceValue;
+            } else {
+                checkoutOtherFeesTotal = checkoutOtherFeesTotal + priceValue;
+            }
+        }
+
+        System.out.println("allSubTotal: " + allSubTotal);
+        System.out.println("checkoutTotal: " + checkoutTotal);
+
+        // Verify checkout values
+        Assert.assertEquals(allSubTotal, checkoutSubtotal, "[ERR] Checking out Subtotal value is incorrect!");
+        Assert.assertEquals((checkoutSubtotal + checkoutOtherFeesTotal), checkoutTotal, "[ERR] Checking out Total value is incorrect!");
     }
 }
