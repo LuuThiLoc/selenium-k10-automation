@@ -26,7 +26,10 @@ public class BuyingCheapComputerTest extends BaseTest implements Urls {
 
         orderComputerFlow.buildCompSpecAndAddToCart();
         orderComputerFlow.verifyShoppingCartPage();
-//        System.out.println(computerData);
+        orderComputerFlow.agreeTOSAndCheckout();
+        orderComputerFlow.inputBillingAddress();
+        orderComputerFlow.inputShippingAddress();
+        orderComputerFlow.selectPaymentMethod();
     }
 
     @DataProvider

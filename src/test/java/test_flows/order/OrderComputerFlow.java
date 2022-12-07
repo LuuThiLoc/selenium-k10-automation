@@ -2,13 +2,20 @@ package test_flows.order;
 
 import model.components.cart.CartItemRowComponent;
 import model.components.cart.TotalComponent;
+import model.components.checkout.ShippingMethodComponent;
 import model.components.order.ComputerEssentialComponent;
+import model.pages.CheckoutOptionsPage;
+import model.pages.CheckoutPage;
 import model.pages.ComputerItemDetailsPage;
 import model.pages.ShoppingCartPage;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
+import test_data.DataObjectBuilder;
 import test_data.order.ComputerData;
+import test_data.user.UserDataObject;
 
+import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -23,6 +30,7 @@ public class OrderComputerFlow<T extends ComputerEssentialComponent> {
     private final ComputerData computerData;
     private int quantity = 1; // default value
     private double totalItemPrice;
+    UserDataObject defaultCheckoutUser;
 
     public OrderComputerFlow(WebDriver driver, Class<T> computerEssentialComponent, ComputerData computerData, int quantity) {
         this.driver = driver;
@@ -130,5 +138,49 @@ public class OrderComputerFlow<T extends ComputerEssentialComponent> {
         // Verify checkout values
         Assert.assertEquals(allSubTotal, checkoutSubtotal, "[ERR] Checking out Subtotal value is incorrect!");
         Assert.assertEquals((checkoutSubtotal + checkoutOtherFeesTotal), checkoutTotal, "[ERR] Checking out Total value is incorrect!");
+
+    }
+
+    public void agreeTOSAndCheckout(){
+        ShoppingCartPage shoppingCartPage = new ShoppingCartPage(driver);
+        shoppingCartPage.totalComp().agreeTOS();
+        shoppingCartPage.totalComp().clickOnCheckoutBtn();
+        new CheckoutOptionsPage(driver).checkoutAsGuest();
+    }
+
+    public void inputBillingAddress() {
+        String defaultUserDataFileLoc = "/src/test/java/test_data/user/DefaultCheckoutUser.json";
+        defaultCheckoutUser = DataObjectBuilder.buildDataObjectFrom(defaultUserDataFileLoc, UserDataObject.class);
+        CheckoutPage checkoutPage = new CheckoutPage(driver);
+        checkoutPage.billingAddressComp().selectInputNewAddress();
+        checkoutPage.billingAddressComp().inputFirstName(defaultCheckoutUser.getFirstName());
+        checkoutPage.billingAddressComp().inputLastName(defaultCheckoutUser.getLastName());
+        checkoutPage.billingAddressComp().inputEmail(defaultCheckoutUser.getEmail());
+        checkoutPage.billingAddressComp().selectCountry(defaultCheckoutUser.getCountry());
+        checkoutPage.billingAddressComp().selectState(defaultCheckoutUser.getState());
+        checkoutPage.billingAddressComp().inputCity(defaultCheckoutUser.getCity());
+        checkoutPage.billingAddressComp().inputAddress1(defaultCheckoutUser.getAdd1());
+        checkoutPage.billingAddressComp().inputZipCode(defaultCheckoutUser.getZipCode());
+        checkoutPage.billingAddressComp().inputPhoneNumber(defaultCheckoutUser.getPhoneNum());
+        checkoutPage.billingAddressComp().clickOnContinueBtn();
+    }
+
+    public void inputShippingAddress(){
+        CheckoutPage checkoutPage = new CheckoutPage(driver);
+        checkoutPage.shippingAddressComp().clickOnContinueBtn();
+    }
+
+    public void selectPaymentMethod(){
+        List<String> shippingMethods = Arrays.asList("Ground", "Next Day Air", "2nd Day Air");
+        int randomIndex = new SecureRandom().nextInt(shippingMethods.size());
+        String randomMethod = shippingMethods.get(randomIndex);
+        CheckoutPage checkoutPage = new CheckoutPage(driver);
+        ShippingMethodComponent shippingMethodComp = checkoutPage.shippingMethodComp();
+        shippingMethodComp.selectShippingMethod(randomMethod);
+        shippingMethodComp.clickOnContinueBtn();
+
+        try{
+            Thread.sleep(2000);
+        }catch (Exception ignored){}
     }
 }
