@@ -2,22 +2,21 @@ package test_flows.order;
 
 import model.components.cart.CartItemRowComponent;
 import model.components.cart.TotalComponent;
+import model.components.checkout.PaymentInformationComponent;
+import model.components.checkout.PaymentMethodComponent;
 import model.components.checkout.ShippingMethodComponent;
 import model.components.order.ComputerEssentialComponent;
-import model.pages.CheckoutOptionsPage;
-import model.pages.CheckoutPage;
-import model.pages.ComputerItemDetailsPage;
-import model.pages.ShoppingCartPage;
+import model.pages.*;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
+import test_data.CreditCardType;
 import test_data.DataObjectBuilder;
+import test_data.PaymentMethodType;
 import test_data.order.ComputerData;
 import test_data.user.UserDataObject;
 
 import java.security.SecureRandom;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,6 +30,8 @@ public class OrderComputerFlow<T extends ComputerEssentialComponent> {
     private int quantity = 1; // default value
     private double totalItemPrice;
     UserDataObject defaultCheckoutUser;
+    PaymentMethodType paymentMethod;
+    CreditCardType creditCardType;
 
     public OrderComputerFlow(WebDriver driver, Class<T> computerEssentialComponent, ComputerData computerData, int quantity) {
         this.driver = driver;
@@ -141,7 +142,7 @@ public class OrderComputerFlow<T extends ComputerEssentialComponent> {
 
     }
 
-    public void agreeTOSAndCheckout(){
+    public void agreeTOSAndCheckout() {
         ShoppingCartPage shoppingCartPage = new ShoppingCartPage(driver);
         shoppingCartPage.totalComp().agreeTOS();
         shoppingCartPage.totalComp().clickOnCheckoutBtn();
@@ -165,12 +166,12 @@ public class OrderComputerFlow<T extends ComputerEssentialComponent> {
         checkoutPage.billingAddressComp().clickOnContinueBtn();
     }
 
-    public void inputShippingAddress(){
+    public void inputShippingAddress() {
         CheckoutPage checkoutPage = new CheckoutPage(driver);
         checkoutPage.shippingAddressComp().clickOnContinueBtn();
     }
 
-    public void selectPaymentMethod(){
+    public void selectShippingMethod() {
         List<String> shippingMethods = Arrays.asList("Ground", "Next Day Air", "2nd Day Air");
         int randomIndex = new SecureRandom().nextInt(shippingMethods.size());
         String randomMethod = shippingMethods.get(randomIndex);
@@ -179,8 +180,78 @@ public class OrderComputerFlow<T extends ComputerEssentialComponent> {
         shippingMethodComp.selectShippingMethod(randomMethod);
         shippingMethodComp.clickOnContinueBtn();
 
-        try{
+        try {
             Thread.sleep(2000);
-        }catch (Exception ignored){}
+        } catch (Exception ignored) {
+        }
     }
+
+    public void selectPaymentMethod() {
+        this.paymentMethod = PaymentMethodType.COD;
+    }
+
+    public void selectPaymentMethod(PaymentMethodType paymentMethod) {
+        if (paymentMethod == null) {
+            throw new IllegalArgumentException("[ERR] Payment method can not be null!");
+        }
+        this.paymentMethod = paymentMethod;
+        CheckoutPage checkoutPage = new CheckoutPage(driver);
+        PaymentMethodComponent paymentMethodComp = checkoutPage.paymentMethodComp();
+        switch (paymentMethod) {
+            case CHECK_MONEY_ORDER:
+                paymentMethodComp.selectCheckMoneyOrderMethod();
+                break;
+            case CREDIT_CARD:
+                paymentMethodComp.selectCreditCardMethod();
+                break;
+            case PURCHASE_ORDER:
+                paymentMethodComp.selectPurchaseOrderMethod();
+                break;
+            default:
+                paymentMethodComp.selectCODMethod();
+                break;
+        }
+
+        paymentMethodComp.clickOnContinueBtnMethod();
+    }
+
+    // https://www.paypalobjects.com/en_GB/vhelp/paypalmanager_help/credit_card_numbers.htm
+    public void inputPaymentInfo(CreditCardType creditCardType) {
+        if (creditCardType == null) {
+            throw new IllegalArgumentException("[ERR] Credit Card type can not be null!");
+        }
+        this.creditCardType = creditCardType;
+        CheckoutPage checkoutPage = new CheckoutPage(driver);
+        PaymentInformationComponent paymentInformationComp = checkoutPage.paymentInformationComp();
+        paymentInformationComp.selectCreditCardType(creditCardType);
+        String cardHolderFirstName = defaultCheckoutUser.getFirstName();
+        String cardHolderLastName = defaultCheckoutUser.getLastName();
+
+        paymentInformationComp.inputCardHolderName(cardHolderFirstName + " " + cardHolderLastName);
+        String cardNum = creditCardType.equals(CreditCardType.VISA) ? "4012888888881881" : "6011000990139424";
+        paymentInformationComp.inputCardNumName(cardNum);
+
+        // Select current month and next year
+        Calendar calendar = new GregorianCalendar();
+        String expiredMonth = String.valueOf((calendar.get(Calendar.MONTH) + 1));
+        String expiredYear = String.valueOf((calendar.get(Calendar.YEAR) + 1));
+        paymentInformationComp.selectExpiredMonth(expiredMonth);
+        paymentInformationComp.selectExpiredYear(expiredYear);
+
+        paymentInformationComp.inputCardCodeName("123");
+        paymentInformationComp.clickOnContinueBtn();
+    }
+
+    public void confirmOrder() {
+        // TODO: Add verification
+
+        new CheckoutPage(driver).confirmOrderComp().clickOnContinueBtn();
+        new CheckoutCompletedPage(driver).clickOnContinueBtn();
+
+        try {
+            Thread.sleep(3000);
+        } catch (Exception ignored) {
+        }
+    }
+
 }

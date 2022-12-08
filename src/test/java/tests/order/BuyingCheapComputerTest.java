@@ -3,7 +3,9 @@ package tests.order;
 import model.components.order.CheapComputerComponent;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+import test_data.CreditCardType;
 import test_data.DataObjectBuilder;
+import test_data.PaymentMethodType;
 import test_data.order.ComputerData;
 import test_flows.order.OrderComputerFlow;
 import tests.BaseTest;
@@ -29,7 +31,10 @@ public class BuyingCheapComputerTest extends BaseTest implements Urls {
         orderComputerFlow.agreeTOSAndCheckout();
         orderComputerFlow.inputBillingAddress();
         orderComputerFlow.inputShippingAddress();
-        orderComputerFlow.selectPaymentMethod();
+        orderComputerFlow.selectShippingMethod();
+        orderComputerFlow.selectPaymentMethod(PaymentMethodType.CREDIT_CARD);
+        orderComputerFlow.inputPaymentInfo(CreditCardType.DISCOVER);
+        orderComputerFlow.confirmOrder();
     }
 
     @DataProvider
