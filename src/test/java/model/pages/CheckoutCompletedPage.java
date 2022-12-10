@@ -14,6 +14,7 @@ public class CheckoutCompletedPage extends BasePage {
 
     public void clickOnContinueBtn() {
         WebElement continueBtnElem = findElement(continueBtnSel);
+        scrollDownToElement(continueBtnElem);
         continueBtnElem.click();
         wait.until(ExpectedConditions.invisibilityOf(continueBtnElem));
     }

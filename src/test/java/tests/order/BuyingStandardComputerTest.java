@@ -1,6 +1,7 @@
 package tests.order;
 
 import model.components.order.StandardComputerComponent;
+import org.openqa.selenium.WebDriver;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import test_data.CreditCardType;
@@ -18,7 +19,7 @@ public class BuyingStandardComputerTest extends BaseTest implements Urls {
 
     @Test(dataProvider = "computerData")
     public void testBuyingStandardComputer(ComputerData computerData) {
-
+        WebDriver driver = getDriver();
         driver.get(Urls.BASE_URL.concat("/build-your-own-computer"));
 
         int randomQuantity = new SecureRandom().nextInt(100) + 2; // quantity(2, 100)

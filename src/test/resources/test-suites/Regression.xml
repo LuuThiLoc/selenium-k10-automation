@@ -1,9 +1,25 @@
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
 
 <suite name="Regression" >
-    <test name="Global Component Test" >
+<!--    <test name="Buying computer chrome" >-->
+<!--        <parameter name="browser" value="chrome"></parameter>-->
+<!--        <classes>-->
+<!--            <class name="tests.order.BuyingCheapComputerTest" />-->
+<!--            <class name="tests.order.BuyingStandardComputerTest" />-->
+<!--        </classes>-->
+<!--    </test>-->
+    <test name="Buying computer firefox" >
+        <parameter name="browser" value="firefox"></parameter>
         <classes>
-            <class name="tests.DemoHomePageTest" />
+            <class name="tests.order.BuyingCheapComputerTest" />
+<!--            <class name="tests.order.BuyingStandardComputerTest" />-->
         </classes>
     </test>
+<!--    <test name="Buying computer safari" >-->
+<!--        <parameter name="browser" value="safari"></parameter>-->
+<!--        <classes>-->
+<!--            <class name="tests.order.BuyingCheapComputerTest" />-->
+<!--            <class name="tests.order.BuyingStandardComputerTest" />-->
+<!--        </classes>-->
+<!--    </test>-->
 </suite>

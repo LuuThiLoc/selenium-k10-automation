@@ -10,27 +10,38 @@ import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Parameters;
 
 import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.util.*;
 
 public class BaseTest {
+    private static final List<DriverFactory> webDriverThreadPool = Collections.synchronizedList(new ArrayList<>());
+    private static ThreadLocal<DriverFactory> driverThread;
+    private String browserName;
 
-    protected static WebDriver driver;
+    protected WebDriver getDriver(){
+        return driverThread.get().getDriver(browserName);
+    }
 
     @BeforeTest
-    public void initBrowserSession() {
-        driver = DriverFactory.getChromeDriver();
+    @Parameters({"browser"})
+    public void initBrowserSession(String browserName) {
+        this.browserName = browserName;
+        driverThread = ThreadLocal.withInitial(() -> {
+            DriverFactory webDriverThread = new DriverFactory();
+            webDriverThreadPool.add(webDriverThread);
+            return webDriverThread;
+        });
     }
 
     @AfterTest(alwaysRun = true)
     public void closeBrowserSession() {
-        if (driver != null) driver.quit();
+        driverThread.get().closeBrowserSession();
     }
 
     @AfterMethod
@@ -53,7 +64,7 @@ public class BaseTest {
 
             try {
                 // 3. Take screenshot
-                File screenshotBase64Data = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+                File screenshotBase64Data = ((TakesScreenshot) driverThread.get().getDriver(browserName)).getScreenshotAs(OutputType.FILE);
 
                 // 4. Save
                 String fileLocation = System.getProperty("user.dir") + "\\screenshot\\" + fileName;

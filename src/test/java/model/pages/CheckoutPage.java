@@ -33,8 +33,4 @@ public class CheckoutPage extends BasePage {
         return findComponent(ConfirmOrderComponent.class, driver);
     }
 
-    public CheckoutCompletedPage checkoutCompletedPage(){
-        return findComponent(CheckoutCompletedPage.class, driver);
-    }
-
 }

@@ -1,5 +1,6 @@
 package model.components.order;
 
+import io.qameta.allure.Step;
 import model.components.Component;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -15,12 +16,17 @@ public abstract class ComputerEssentialComponent extends BaseItemDetailsComponen
 
     public abstract String selectRAMType(String type);
 
+    @Step("Select HDD with value {type}")
     public String selectHDD(String type){
         return selectCompOption(type);
     }
+
+    @Step("Select OS with value {type}")
     public String selectOS(String type){
         return selectCompOption(type);
     }
+
+    @Step("Select Computer Option with value {type}")
     public String selectCompOption(String type) {
 
         String selectorStr = "//label[contains(text(),\"" + type + "\")]";
