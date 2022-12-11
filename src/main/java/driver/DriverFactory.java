@@ -15,54 +15,78 @@ import java.time.Duration;
 
 public class DriverFactory {
     private WebDriver driver;
-
     public WebDriver getDriver(String browserName) {
+        boolean isRemoteRunning = System.getProperty("hub") != null;
+        if (isRemoteRunning) return getRemoteWebDriver(browserName, "hub");
+        else return getLocalDriver(browserName);
 
-        String currentProjectLocation = System.getProperty("user.dir");
-        String chromeDriverLocation;
+//        String currentProjectLocation = System.getProperty("user.dir");
+//        String chromeDriverLocation;
+//
+//        if (OS.isFamilyMac()) {
+//            chromeDriverLocation = "/src/test/resources/drivers/chromedriver.exe";
+//        } else if (OS.isFamilyWindows()) {
+//            chromeDriverLocation = "\\src\\test\\resources\\drivers\\chromedriver.exe.exe";
+//        } else {
+//            throw new RuntimeException("[ERR] Couldn't detect the OS");
+//        }
+//
+//        String chromeAbsoluteLocation = currentProjectLocation.concat(chromeDriverLocation);
+//        System.setProperty("webdriver.chrome.driver", chromeAbsoluteLocation);
 
-        if (OS.isFamilyMac()) {
-            chromeDriverLocation = "/src/test/resources/drivers/chromedriver.exe";
-        } else if (OS.isFamilyWindows()) {
-            chromeDriverLocation = "\\src\\test\\resources\\drivers\\chromedriver.exe.exe";
-        } else {
-            throw new RuntimeException("[ERR] Couldn't detect the OS");
-        }
+    }
 
-        String chromeAbsoluteLocation = currentProjectLocation.concat(chromeDriverLocation);
-        System.setProperty("webdriver.chrome.driver", chromeAbsoluteLocation);
-
+    private WebDriver getLocalDriver(String browserName) {
         if (driver == null) {
-            DesiredCapabilities desiredCapabilities = new DesiredCapabilities();
-            desiredCapabilities.setPlatform(Platform.ANY);
-
-            if(browserName == null){
+            if (browserName == null) {
                 throw new IllegalArgumentException("[ERR] Browser name can not be null!");
             }
 
             switch (browserName) {
                 case "chrome":
-//                    driver = new ChromeDriver();
+                    driver = new ChromeDriver();
+                    break;
+                case "firefox":
+                    driver = new FirefoxDriver();
+                    break;
+                case "safari":
+                    driver = new SafariDriver();
+                    break;
+                default:
+                    throw new IllegalArgumentException(browserName + " is not supported!");
+            }
+        }
+        return driver;
+    }
+
+    private WebDriver getRemoteWebDriver(String browserName, String hub) {
+        if (driver == null) {
+            DesiredCapabilities desiredCapabilities = new DesiredCapabilities();
+            desiredCapabilities.setPlatform(Platform.ANY);
+
+            if (browserName == null) {
+                throw new IllegalArgumentException("[ERR] Browser name can not be null!");
+            }
+
+            switch (browserName) {
+                case "chrome":
                     desiredCapabilities.setBrowserName("chrome");
                     break;
                 case "firefox":
-//                    driver = new FirefoxDriver();
                     desiredCapabilities.setBrowserName("firefox");
                     break;
                 case "safari":
-//                    driver = new SafariDriver();
                     desiredCapabilities.setBrowserName("safari");
                     break;
                 default:
                     throw new IllegalArgumentException(browserName + " is not supported!");
             }
 
-            try{
-                String hub = "http://localhost:4444/wd/hub";
-                URL urlHub = new URL(hub);
+            try {
+                URL urlHub = new URL(hub.concat("/wd/hub"));
                 driver = new RemoteWebDriver(urlHub, desiredCapabilities);
                 driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(15L));
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -99,8 +123,8 @@ public class DriverFactory {
         return driver;
     }
 
-    public void closeBrowserSession(){
-        if(driver != null){
+    public void closeBrowserSession() {
+        if (driver != null) {
             driver.quit();
         }
     }
