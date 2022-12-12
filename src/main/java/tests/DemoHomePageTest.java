@@ -1,4 +1,4 @@
-package test;
+package tests;
 
 import driver.DriverFactory;
 import model.components.global.footer.*;

@@ -1,4 +1,4 @@
-package test;
+package tests.global.footer;
 
 import driver.DriverFactory;
 import model.pages.HerokuLoginPage;

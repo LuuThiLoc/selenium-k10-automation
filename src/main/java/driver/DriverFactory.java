@@ -16,27 +16,41 @@ import java.time.Duration;
 public class DriverFactory {
     private WebDriver driver;
     public WebDriver getDriver(String browserName) {
+
+        String currentProjectLocation = System.getProperty("user.dir");
+        String chromeDriverLocation;
+
+        if (OS.isFamilyMac()) {
+            chromeDriverLocation = "/src/main/resources/drivers/chromedriver.exe";
+        } else if (OS.isFamilyWindows()) {
+            chromeDriverLocation = "\\src\\main\\resources\\drivers\\chromedriver.exe";
+        } else {
+            throw new RuntimeException("[ERR] Couldn't detect the OS");
+        }
+
+        String chromeAbsoluteLocation = currentProjectLocation.concat(chromeDriverLocation);
+        System.setProperty("webdriver.chrome.driver", chromeAbsoluteLocation);
+
         boolean isRemoteRunning = System.getProperty("hub") != null;
-        if (isRemoteRunning) return getRemoteWebDriver(browserName, "hub");
+        if (isRemoteRunning) return getRemoteWebDriver(browserName, System.getProperty("hub"));
         else return getLocalDriver(browserName);
-
-//        String currentProjectLocation = System.getProperty("user.dir");
-//        String chromeDriverLocation;
-//
-//        if (OS.isFamilyMac()) {
-//            chromeDriverLocation = "/src/test/resources/drivers/chromedriver.exe";
-//        } else if (OS.isFamilyWindows()) {
-//            chromeDriverLocation = "\\src\\test\\resources\\drivers\\chromedriver.exe.exe";
-//        } else {
-//            throw new RuntimeException("[ERR] Couldn't detect the OS");
-//        }
-//
-//        String chromeAbsoluteLocation = currentProjectLocation.concat(chromeDriverLocation);
-//        System.setProperty("webdriver.chrome.driver", chromeAbsoluteLocation);
-
     }
 
     private WebDriver getLocalDriver(String browserName) {
+        String currentProjectLocation = System.getProperty("user.dir");
+        String chromeDriverLocation;
+
+        if (OS.isFamilyMac()) {
+            chromeDriverLocation = "/src/main/resources/drivers/chromedriver.exe";
+        } else if (OS.isFamilyWindows()) {
+            chromeDriverLocation = "\\src\\main\\resources\\drivers\\chromedriver.exe";
+        } else {
+            throw new RuntimeException("[ERR] Couldn't detect the OS");
+        }
+
+        String chromeAbsoluteLocation = currentProjectLocation.concat(chromeDriverLocation);
+        System.setProperty("webdriver.chrome.driver", chromeAbsoluteLocation);
+
         if (driver == null) {
             if (browserName == null) {
                 throw new IllegalArgumentException("[ERR] Browser name can not be null!");
@@ -99,9 +113,9 @@ public class DriverFactory {
         String chromeDriverLocation;
 
         if (OS.isFamilyMac()) {
-            chromeDriverLocation = "/src/test/resources/drivers/chromedriver.exe";
+            chromeDriverLocation = "/src/main/resources/drivers/chromedriver.exe";
         } else if (OS.isFamilyWindows()) {
-            chromeDriverLocation = "\\src\\test\\resources\\drivers\\chromedriver.exe.exe";
+            chromeDriverLocation = "\\src\\main\\resources\\drivers\\chromedriver.exe";
         } else {
             throw new RuntimeException("[ERR] Couldn't detect the OS");
         }
@@ -114,7 +128,7 @@ public class DriverFactory {
         chromeOptions.addArguments("--incognito");
 
         WebDriver driver = new ChromeDriver(chromeOptions);
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5L));
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(15L));
 //        driver.manage().deleteAllCookies();
 //        driver.get("chrome://settings/clearBrowserData");
 //        driver.switchTo().activeElement();

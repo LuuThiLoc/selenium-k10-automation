@@ -1,11 +1,11 @@
-package test;
+package tests;
 
 import driver.DriverFactory;
-import model.pages.LoginPageMod02;
+import model.pages.LoginPageMod01;
 import org.openqa.selenium.WebDriver;
 import url.Urls;
 
-public class LoginMod02Test implements Urls {
+public class LoginMod01Test implements Urls {
 
     public static void main(String[] args) {
         WebDriver driver = DriverFactory.getChromeDriver();
@@ -15,10 +15,10 @@ public class LoginMod02Test implements Urls {
             driver.get(HEROKU_BASE_URL.concat(LOGIN_SLUG));
 
             // Login with creds
-            LoginPageMod02 loginPageMod02 = new LoginPageMod02(driver);
-            loginPageMod02.inputUsernameElem("Mary");
-            loginPageMod02.inputPasswordElem("12345678");
-            loginPageMod02.clickOnLoginBtnElem();
+            LoginPageMod01 loginPageMod01 = new LoginPageMod01(driver);
+            loginPageMod01.usernameElem().sendKeys("Mary");
+            loginPageMod01.passwordElem().sendKeys("12345678");
+            loginPageMod01.loginBtnElem().click();
 
             // Debug purpose ONLY
             Thread.sleep(2000);

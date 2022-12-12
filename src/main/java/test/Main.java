@@ -94,11 +94,11 @@ public class Main {
         System.out.println(suite.toXml());
 
         // Add the suite to the suite list
-//        List<XmlSuite> suites = new ArrayList<>();
-//        suites.add(suite);
-//
-//        // Invoke run() method
-//        testNG.setXmlSuites(suites);
-//        testNG.run();
+        List<XmlSuite> suites = new ArrayList<>();
+        suites.add(suite);
+
+        // Invoke run() method
+        testNG.setXmlSuites(suites);
+        testNG.run();
     }
 }
