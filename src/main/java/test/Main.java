@@ -19,7 +19,7 @@ public class Main {
         List<Class<?>> testsClasses = new ArrayList<>();
 
         for (ClassPath.ClassInfo info : ClassPath.from(loader).getTopLevelClasses()) {
-            if(info.getName().startsWith("test.") && !info.getName().equalsIgnoreCase("test.BaseTest") && !info.getName().equalsIgnoreCase("test.Main")){
+            if (info.getName().startsWith("test.") && !info.getName().equalsIgnoreCase("test.BaseTest") && !info.getName().equalsIgnoreCase("test.Main")) {
                 testsClasses.add(info.load());
             }
         }
@@ -27,17 +27,18 @@ public class Main {
         // Get browser
         String browser = System.getProperty("browser");
 //        String browser = System.getenv("browser");
-        if(browser == null){
+        if (browser == null) {
             throw new RuntimeException("Please provide browser via -Dbrowser");
         }
         try {
             BrowserType.valueOf(browser);
-        } catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("[ERR] " + browser + " is not supported, we covered for " + Arrays.toString(BrowserType.values()));
         }
 
         // We will parallel base on maximum parallel session
-        final int MAX_PARALLEL_SESSION = 4;
+        int desiredParallelSession = 4;
+        final int MAX_PARALLEL_SESSION = Math.min(testsClasses.size(), desiredParallelSession);
         List<String> testGroupNames = new ArrayList<>();
         for (int index = 0; index < MAX_PARALLEL_SESSION; index++) {
             testGroupNames.add("Group " + (index + 1));
@@ -79,14 +80,14 @@ public class Main {
         boolean isTestingOnSafari = browser.equals("safari");
         suite.setTests(allTests);
         suite.setParallel(XmlSuite.ParallelMode.TESTS);
-        suite.setThreadCount(isTestingOnSafari ? 1 : MAX_PARALLEL_SESSION);
+        suite.setThreadCount(isTestingOnSafari ? 1 : desiredParallelSession);
 
         // Run a group of test
-        if(isTestingOnSafari){
+        if (isTestingOnSafari) {
             suite.addIncludedGroup("smoke");
         } else {
-            String targetGroup = args.length !=0 ? args[0] : null;
-            if(targetGroup != null){
+            String targetGroup = args.length != 0 ? args[0] : null;
+            if (targetGroup != null) {
                 suite.addIncludedGroup(targetGroup);
             }
         }
